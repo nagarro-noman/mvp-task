@@ -28,6 +28,7 @@ resource "aws_subnet" "private_subnet_1" {
 resource "aws_security_group" "custom_security_group" {
   name        = "custom-security-group"
   description = "Allow inbound traffic on port 5000 and port 22"
+  vpc_id      = aws_vpc.my_vpc.id
 
   ingress {
     from_port   = 22
@@ -42,6 +43,15 @@ resource "aws_security_group" "custom_security_group" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
 }
 
 # resource "aws_subnet" "private_subnet_2" {
@@ -68,18 +78,30 @@ resource "aws_route_table_association" "public_subnet_1_association" {
   route_table_id = aws_route_table.public_route_table.id
 }
 
+resource "aws_route_table_association" "private_subnet_1_association" {
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
 # resource "aws_route_table_association" "public_subnet_2_association" {
 #   subnet_id      = aws_subnet.public_subnet_2.id
 #   route_table_id = aws_route_table.public_route_table.id
 # }
+
+resource "aws_iam_instance_profile" "ec2_s3_role_profile" {
+  name = "ec2_s3_profile"
+  role = aws_iam_role.ec2_s3_role.name
+}
 
 resource "aws_instance" "private_instance_1a" {
   subnet_id                   = aws_subnet.private_subnet_1.id
   instance_type               = "t2.micro"
   ami                         = "ami-08e5424edfe926b43"
   associate_public_ip_address = true
-  security_groups             = aws_security_group.custom_security_group
-  user_data                   = <<-EOF
+  vpc_security_group_ids      = [aws_security_group.custom_security_group.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2_s3_role_profile.name
+
+  user_data = <<-EOF
     #!/bin/bash
     apt update
     apt install -y git python3-pip

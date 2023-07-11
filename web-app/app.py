@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from werkzeug.utils import secure_filename
 import os
 import boto3
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/tmp'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/favicon.ico")
@@ -20,6 +21,8 @@ def home():
 def upload():
     if request.method == 'POST':
         file = request.files['file']
+        filename = secure_filename(file.filename)
+
         if file:
             # Save the file locally
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
