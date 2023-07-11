@@ -88,60 +88,6 @@ resource "aws_route_table_association" "private_subnet_1_association" {
 #   route_table_id = aws_route_table.public_route_table.id
 # }
 
-resource "aws_iam_instance_profile" "ec2_s3_role_profile" {
-  name = "ec2_s3_profile"
-  role = aws_iam_role.ec2_s3_role.name
-}
-
-resource "aws_instance" "private_instance_1a" {
-  subnet_id                   = aws_subnet.private_subnet_1.id
-  instance_type               = "t2.micro"
-  ami                         = "ami-08e5424edfe926b43"
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.custom_security_group.id]
-  iam_instance_profile        = aws_iam_instance_profile.ec2_s3_role_profile.name
-
-  user_data = <<-EOF
-    #!/bin/bash
-    apt update
-    apt install -y git python3-pip
-    cd /home/ubuntu
-    git clone https://github.com/nomannagarro/mvp-task.git
-    cd mvp-task/web-app
-    pip install -r requirements.txt
-  EOF
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = {
-    key   = "Name"
-    value = "private-instance-subnet-1a"
-  }
-}
-
-# resource "aws_instance" "private_instance_1b" {
-#   subnet_id     = aws_subnet.private_subnet_2.id
-#   instance_type = "t2.micro"
-#   ami           = "ami-08e5424edfe926b43"
-
-#   user_data = <<-EOF
-#     #!/bin/bash
-#     apt update
-#     apt install -y git
-#   EOF
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-
-#   tags = {
-#     key                 = "Name"
-#     value               = "private-instance-subnet-1b"
-#   }
-# }
-
 # resource "aws_launch_configuration" "private_launch_config_1a" {
 #   name          = "private-launch-config-1a"
 #   image_id      = aws_instance.private_instance_1a.ami
@@ -207,7 +153,3 @@ resource "aws_instance" "private_instance_1a" {
 #     create_before_destroy = true
 #   }
 # }
-
-resource "aws_s3_bucket" "my_bucket" {
-  bucket = "nagp-task-bucket-3163353"
-}
