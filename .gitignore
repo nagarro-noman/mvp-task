@@ -1,0 +1,6 @@
+teraform/.terraform.lock.hcl
+teraform/.terraform.tfstate.lock.info
+teraform/terraform.tfstate
+teraform/.terraform/providers/registry.terraform.io/hashicorp/aws/3.55.0/linux_amd64/terraform-provider-aws_v3.55.0_x5
+teraform/.terraform/providers/registry.terraform.io/hashicorp/aws/4.67.0/linux_amd64/terraform-provider-aws_v4.67.0_x5
+teraform/.terraform/providers/registry.terraform.io/hashicorp/template/2.2.0/linux_amd64/terraform-provider-template_v2.2.0_x4
