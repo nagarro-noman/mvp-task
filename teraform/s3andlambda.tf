@@ -4,15 +4,41 @@ data "archive_file" "lambda_function" {
   source_dir  = "${path.module}/lambda_function"
 }
 
+resource "aws_security_group" "lambda_security_group" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  ingress {
+    protocol  = -1
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "lambda-security-group"
+  }
+}
+
 resource "aws_lambda_function" "character_counter_lambda" {
   function_name    = "CharacterCounterLambda"
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.8"
-  timeout          = 10
+  timeout          = 300
   memory_size      = 128
   role             = aws_iam_role.lambda_execution_role.arn
   filename         = data.archive_file.lambda_function.output_path
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_subnet_1.id]
+    security_group_ids = [aws_security_group.lambda_security_group.id]
+  }
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
@@ -56,6 +82,11 @@ resource "aws_iam_policy" "lambda_s3_policy" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment_lambda_vpc_access_execution" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {

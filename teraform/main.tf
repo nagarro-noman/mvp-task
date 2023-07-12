@@ -12,12 +12,12 @@ resource "aws_subnet" "public_subnet_1" {
   map_public_ip_on_launch = true
 }
 
-# resource "aws_subnet" "public_subnet_2" {
-#   vpc_id                  = aws_vpc.my_vpc.id
-#   cidr_block              = "10.0.2.0/24"
-#   availability_zone       = "ap-south-1b"
-#   map_public_ip_on_launch = true
-# }
+resource "aws_subnet" "public_subnet_2" {
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "ap-south-1b"
+  map_public_ip_on_launch = true
+}
 
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = aws_vpc.my_vpc.id
@@ -54,11 +54,11 @@ resource "aws_security_group" "custom_security_group" {
 
 }
 
-# resource "aws_subnet" "private_subnet_2" {
-#   vpc_id                  = aws_vpc.my_vpc.id
-#   cidr_block              = "10.0.4.0/24"
-#   availability_zone       = "ap-south-1b"
-# }
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.my_vpc.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "ap-south-1b"
+}
 
 resource "aws_internet_gateway" "my_igw" {
   vpc_id = aws_vpc.my_vpc.id
@@ -78,15 +78,23 @@ resource "aws_route_table_association" "public_subnet_1_association" {
   route_table_id = aws_route_table.public_route_table.id
 }
 
+# this should not exist but just adding this to save cost of NAT gateway.
 resource "aws_route_table_association" "private_subnet_1_association" {
   subnet_id      = aws_subnet.private_subnet_1.id
   route_table_id = aws_route_table.public_route_table.id
 }
 
-# resource "aws_route_table_association" "public_subnet_2_association" {
-#   subnet_id      = aws_subnet.public_subnet_2.id
-#   route_table_id = aws_route_table.public_route_table.id
-# }
+resource "aws_route_table_association" "public_subnet_2_association" {
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
+# this should not exist but just adding this to save cost of NAT gateway.
+resource "aws_route_table_association" "private_subnet_2_association" {
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.public_route_table.id
+}
+
 
 # resource "aws_launch_configuration" "private_launch_config_1a" {
 #   name          = "private-launch-config-1a"

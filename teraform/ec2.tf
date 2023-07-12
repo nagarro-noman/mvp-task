@@ -65,6 +65,7 @@ resource "aws_instance" "private_instance_1a" {
     git clone https://github.com/nomannagarro/mvp-task.git
     cd mvp-task/web-app
     pip install -r requirements.txt
+    nohup python3 app.py &
   EOF
 
   lifecycle {
@@ -77,23 +78,31 @@ resource "aws_instance" "private_instance_1a" {
   }
 }
 
-# resource "aws_instance" "private_instance_1b" {
-#   subnet_id     = aws_subnet.private_subnet_2.id
-#   instance_type = "t2.micro"
-#   ami           = "ami-08e5424edfe926b43"
+resource "aws_instance" "private_instance_1b" {
+  subnet_id                   = aws_subnet.private_subnet_2.id
+  instance_type               = "t2.micro"
+  ami                         = "ami-08e5424edfe926b43"
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.custom_security_group.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2_s3_role_profile.name
 
-#   user_data = <<-EOF
-#     #!/bin/bash
-#     apt update
-#     apt install -y git
-#   EOF
+  user_data = <<-EOF
+    #!/bin/bash
+    apt update
+    apt install -y git python3-pip
+    cd /home/ubuntu
+    git clone https://github.com/nomannagarro/mvp-task.git
+    cd mvp-task/web-app
+    pip install -r requirements.txt
+    nohup python3 app.py &
+  EOF
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
+  lifecycle {
+    create_before_destroy = true
+  }
 
-#   tags = {
-#     key                 = "Name"
-#     value               = "private-instance-subnet-1b"
-#   }
-# }
+  tags = {
+    key   = "Name"
+    value = "private-instance-subnet-1b"
+  }
+}
