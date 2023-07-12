@@ -6,7 +6,6 @@ from botocore.exceptions import ClientError
 s3 = boto3.client('s3')
 ssm = boto3.client('ssm')
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 def get_rds_endpoint():
     try:
@@ -14,20 +13,24 @@ def get_rds_endpoint():
         rds_endpoint = response['Parameter']['Value']
         return rds_endpoint
     except ClientError as e:
-        logger.error(f"Error retrieving RDS endpoint from Parameter Store: {str(e)}")
+        print(f"Error retrieving RDS endpoint from Parameter Store: {str(e)}")
         raise e
 
 def lambda_handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
 
+    print(f"Bucket : {bucket}")
+    print(f"KEY : {key}")
+
     response = s3.get_object(Bucket=bucket, Key=key)
     content = response['Body'].read().decode('utf-8')
     char_count = len(content)
 
-    logger.info(f"Uploaded file '{key}' in bucket '{bucket}' has {char_count} characters.")
+    print(f"Uploaded file '{key}' in bucket '{bucket}' has {char_count} characters.")
     
     response = s3.delete_object(Bucket=bucket, Key=key)
+    print(f"Delete response: {response}")
 
     # Store data in RDS
     rds_host = get_rds_endpoint()
@@ -35,6 +38,7 @@ def lambda_handler(event, context):
     username = "admin"
     password = "password"
 
+    print(f"HOST name : {rds_host}")
     try:
         conn = pymysql.connect(rds_host, user=username, passwd=password, db=db_name, connect_timeout=5)
         with conn.cursor() as cursor:

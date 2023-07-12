@@ -35,10 +35,10 @@ resource "aws_lambda_function" "character_counter_lambda" {
   role             = aws_iam_role.lambda_execution_role.arn
   filename         = data.archive_file.lambda_function.output_path
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
-  vpc_config {
-    subnet_ids         = [aws_subnet.private_subnet_1.id]
-    security_group_ids = [aws_security_group.lambda_security_group.id]
-  }
+  # vpc_config {
+  #   subnet_ids         = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
+  #   security_group_ids = [aws_security_group.lambda_security_group.id]
+  # }
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
@@ -73,7 +73,8 @@ resource "aws_iam_policy" "lambda_s3_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:GetObject"
+        "s3:GetObject",
+        "s3:DeleteObject"
       ],
       "Resource": [
         "arn:aws:s3:::nagp-task-bucket-3163353/*"
@@ -84,19 +85,24 @@ resource "aws_iam_policy" "lambda_s3_policy" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment_lambda_vpc_access_execution" {
-  role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = aws_iam_policy.lambda_s3_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "iam_role_policy_attachment_lambda_vpc_access_execution" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_execution_role_attachment" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_ssm_role_attachment" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
 }
 
 resource "aws_s3_bucket" "my_bucket" {

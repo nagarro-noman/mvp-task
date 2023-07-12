@@ -10,3 +10,4 @@ teraform/.terraform/providers/registry.terraform.io/hashicorp/archive/2.4.0/linu
 teraform/.terraform/providers/registry.terraform.io/hashicorp/aws/5.7.0/linux_amd64/terraform-provider-aws_v5.7.0_x5
 teraform/lambda_function.zip
 teraform/.terraform/providers/registry.terraform.io/hashicorp/null/3.2.1/linux_amd64/terraform-provider-null_v3.2.1_x5
+teraform/lambda_layer.zip

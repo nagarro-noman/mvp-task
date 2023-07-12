@@ -25,6 +25,12 @@ resource "aws_subnet" "private_subnet_1" {
   availability_zone = "ap-south-1a"
 }
 
+resource "aws_subnet" "private_subnet_2" {
+  vpc_id            = aws_vpc.my_vpc.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "ap-south-1b"
+}
+
 resource "aws_security_group" "custom_security_group" {
   name        = "custom-security-group"
   description = "Allow inbound traffic on port 5000 and port 22"
@@ -52,12 +58,6 @@ resource "aws_security_group" "custom_security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-}
-
-resource "aws_subnet" "private_subnet_2" {
-  vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.4.0/24"
-  availability_zone = "ap-south-1b"
 }
 
 resource "aws_internet_gateway" "my_igw" {
@@ -91,7 +91,7 @@ resource "aws_route_table_association" "public_subnet_2_association" {
 
 # this should not exist but just adding this to save cost of NAT gateway.
 resource "aws_route_table_association" "private_subnet_2_association" {
-  subnet_id      = aws_subnet.private_subnet_1.id
+  subnet_id      = aws_subnet.private_subnet_2.id
   route_table_id = aws_route_table.public_route_table.id
 }
 

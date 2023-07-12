@@ -19,7 +19,8 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 resource "aws_db_instance" "rds_instance" {
   identifier             = "my-rds-instance"
   engine                 = "mysql"
-  engine_version         = "8.0.23"
+  engine_version         = "8.0.33"
+  skip_final_snapshot    = true
   instance_class         = "db.t2.micro"
   allocated_storage      = 20
   max_allocated_storage  = 20
@@ -45,10 +46,10 @@ resource "aws_ssm_parameter" "rds_endpoint_parameter" {
   value       = data.template_file.rds_endpoint_template.rendered
 }
 
-resource "null_resource" "store_rds_endpoint" {
-  provisioner "local-exec" {
-    command = "aws ssm put-parameter --name /rds/endpoint --value ${aws_db_instance.rds_instance.endpoint} --type String"
-  }
-  depends_on = [aws_ssm_parameter.rds_endpoint_parameter]
-}
+# resource "null_resource" "store_rds_endpoint" {
+#   provisioner "local-exec" {
+#     command = "aws ssm put-parameter --name /rds/endpoint --value ${aws_db_instance.rds_instance.endpoint} --type String"
+#   }
+#   depends_on = [aws_ssm_parameter.rds_endpoint_parameter]
+# }
 
