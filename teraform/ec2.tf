@@ -70,6 +70,7 @@ resource "aws_instance" "private_instance_1a" {
     git clone https://github.com/nomannagarro/mvp-task.git
     cd mvp-task/web-app
     pip install -r requirements.txt
+    python3 create_table.py
     nohup python3 app.py &
   EOF
 

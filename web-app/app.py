@@ -54,8 +54,6 @@ def get_rds_endpoint():
 
 @app.route('/result')
 def results():
-    # file_list = os.listdir(app.config['UPLOAD_FOLDER'])
-    # print(f"result = {file_list}")
     rds_host = get_rds_endpoint()
     db_name = "mydatabase"
     username = "admin"
@@ -75,7 +73,6 @@ def results():
         cursor.close()
         conn.close()
     return render_template('results.html', files=row)
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
