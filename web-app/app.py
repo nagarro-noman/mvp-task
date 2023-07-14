@@ -6,6 +6,7 @@ import boto3
 app = Flask(__name__)
 UPLOAD_FOLDER = '/tmp'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.environ['AWS_DEFAULT_REGION'] = 'ap-south-1'
 
 @app.route("/favicon.ico")
 def favicon():
