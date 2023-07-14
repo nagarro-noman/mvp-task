@@ -11,7 +11,7 @@ def get_rds_endpoint():
     try:
         response = ssm.get_parameter(Name='/rds/endpoint', WithDecryption=False)
         rds_endpoint = response['Parameter']['Value']
-        return rds_endpoint
+        return rds_endpoint[:-5]
     except ClientError as e:
         print(f"Error retrieving RDS endpoint from Parameter Store: {str(e)}")
         raise e
@@ -19,6 +19,7 @@ def get_rds_endpoint():
 def lambda_handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
+    char_count = 0
 
     print(f"Bucket : {bucket}")
     print(f"KEY : {key}")
@@ -40,9 +41,9 @@ def lambda_handler(event, context):
 
     print(f"HOST name : {rds_host}")
     try:
-        conn = pymysql.connect(rds_host, user=username, passwd=password, db=db_name, connect_timeout=5)
+        conn = pymysql.connect(host=rds_host, user=username, passwd=password, db=db_name)
         with conn.cursor() as cursor:
-            insert_query = "INSERT INTO character_counts (name, letter_count) VALUES (%s, %s)"
+            insert_query = "INSERT INTO file_record (File_Name, No_Of_Letters) VALUES (%s, %s)"
             cursor.execute(insert_query, (key, char_count))
             conn.commit()
         logger.info("Data stored in RDS successfully.")

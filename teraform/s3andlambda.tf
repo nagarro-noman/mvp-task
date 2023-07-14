@@ -77,7 +77,8 @@ resource "aws_iam_policy" "lambda_s3_policy" {
         "s3:DeleteObject"
       ],
       "Resource": [
-        "arn:aws:s3:::nagp-task-bucket-3163353/*"
+        "${aws_s3_bucket.my_bucket.arn}",
+        "${aws_s3_bucket.my_bucket.arn}/*"
       ]
     }
   ]
@@ -107,6 +108,7 @@ resource "aws_iam_role_policy_attachment" "lambda_ssm_role_attachment" {
 
 resource "aws_s3_bucket" "my_bucket" {
   bucket = "nagp-task-bucket-3163353"
+
 }
 
 resource "aws_lambda_permission" "s3_lambda_permission" {

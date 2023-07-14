@@ -4,10 +4,18 @@ resource "aws_security_group" "rds_security_group" {
   vpc_id      = aws_vpc.my_vpc.id
 
   ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.lambda_security_group.id]
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 }
 
@@ -27,7 +35,7 @@ resource "aws_db_instance" "rds_instance" {
   db_name                = "mydatabase"
   username               = "admin"
   password               = "password"
-  publicly_accessible    = false
+  publicly_accessible    = true
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.rds_security_group.id]
 
@@ -35,6 +43,7 @@ resource "aws_db_instance" "rds_instance" {
     Name = "MyRDSInstance"
   }
 }
+
 data "template_file" "rds_endpoint_template" {
   template = aws_db_instance.rds_instance.endpoint
 }
@@ -45,11 +54,3 @@ resource "aws_ssm_parameter" "rds_endpoint_parameter" {
   type        = "String"
   value       = data.template_file.rds_endpoint_template.rendered
 }
-
-# resource "null_resource" "store_rds_endpoint" {
-#   provisioner "local-exec" {
-#     command = "aws ssm put-parameter --name /rds/endpoint --value ${aws_db_instance.rds_instance.endpoint} --type String"
-#   }
-#   depends_on = [aws_ssm_parameter.rds_endpoint_parameter]
-# }
-
