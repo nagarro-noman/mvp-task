@@ -38,7 +38,7 @@ def upload():
             # Delete the local file
             os.remove(file_path)
 
-            return redirect(url_for('results'))
+            return redirect(url_for('upload'))
     return render_template('upload.html')
 
 
@@ -66,10 +66,7 @@ def results():
         with conn.cursor() as cursor:
             query = "SELECT File_Name, No_Of_Letters FROM file_record"
             cursor.execute(query)
-            
-            # Fetch all the rows from the result set
             rows = cursor.fetchall()
-
         print("Data read from RDS successfully.")
     except Exception as e:
         print(f"Error storing data in RDS: {str(e)}")
