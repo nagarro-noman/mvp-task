@@ -49,6 +49,11 @@ resource "aws_iam_instance_profile" "ec2_s3_role_profile" {
   role = aws_iam_role.ec2_s3_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "ec2_ssm_role_attachment" {
+  role       = aws_iam_role.ec2_s3_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+}
+
 resource "aws_instance" "private_instance_1a" {
   subnet_id                   = aws_subnet.private_subnet_1.id
   instance_type               = "t2.micro"

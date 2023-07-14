@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from werkzeug.utils import secure_filename
 import os
 import boto3
+import pymysql
 
 app = Flask(__name__)
 UPLOAD_FOLDER = '/tmp'
@@ -69,9 +70,9 @@ def results():
             # Fetch all the rows from the result set
             rows = cursor.fetchall()
 
-        logger.info("Data read from RDS successfully.")
+        print("Data read from RDS successfully.")
     except Exception as e:
-        logger.error(f"Error storing data in RDS: {str(e)}")
+        print(f"Error storing data in RDS: {str(e)}")
     finally:
         # Close the cursor and connection
         cursor.close()
