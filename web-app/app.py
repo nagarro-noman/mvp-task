@@ -72,7 +72,7 @@ def results():
         # Close the cursor and connection
         cursor.close()
         conn.close()
-    return render_template('results.html', files=row)
+    return render_template('results.html', files=rows)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

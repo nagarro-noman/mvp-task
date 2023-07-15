@@ -1,5 +1,16 @@
 import pymysql
 
+
+def get_rds_endpoint():
+    try:
+        ssm = boto3.client('ssm')
+        response = ssm.get_parameter(Name='/rds/endpoint', WithDecryption=False)
+        rds_endpoint = response['Parameter']['Value']
+        return rds_endpoint[:-5]
+    except ClientError as e:
+        print(f"Error retrieving RDS endpoint from Parameter Store: {str(e)}")
+        raise e
+
 def create_table():
     rds_host = get_rds_endpoint()
     db_name = "mydatabase"
