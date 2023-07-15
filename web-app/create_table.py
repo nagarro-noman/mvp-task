@@ -7,7 +7,7 @@ def get_rds_endpoint():
         response = ssm.get_parameter(Name='/rds/endpoint', WithDecryption=False)
         rds_endpoint = response['Parameter']['Value']
         return rds_endpoint[:-5]
-    except ClientError as e:
+    except Exception as e:
         print(f"Error retrieving RDS endpoint from Parameter Store: {str(e)}")
         raise e
 
