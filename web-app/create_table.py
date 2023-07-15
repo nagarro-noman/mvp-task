@@ -1,5 +1,5 @@
+import boto3
 import pymysql
-
 
 def get_rds_endpoint():
     try:
