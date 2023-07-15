@@ -3,7 +3,7 @@ import pymysql
 
 def get_rds_endpoint():
     try:
-        ssm = boto3.client('ssm')
+        ssm = boto3.client('ssm', 'ap-south-1')
         response = ssm.get_parameter(Name='/rds/endpoint', WithDecryption=False)
         rds_endpoint = response['Parameter']['Value']
         return rds_endpoint[:-5]
