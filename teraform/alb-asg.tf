@@ -88,9 +88,9 @@ resource "aws_lb_listener_rule" "result_listener_rule" {
 
 resource "aws_autoscaling_group" "result_autoscaling_group" {
   name                 = "result-autoscaling-group"
-  min_size             = 1
+  min_size             = 2
   max_size             = 4
-  desired_capacity     = 1
+  desired_capacity     = 2
   vpc_zone_identifier  = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
   launch_configuration = aws_launch_configuration.result_launch_configuration.name
 
@@ -99,9 +99,9 @@ resource "aws_autoscaling_group" "result_autoscaling_group" {
 
 resource "aws_autoscaling_group" "upload_autoscaling_group" {
   name                 = "upload-autoscaling-group"
-  min_size             = 1
+  min_size             = 2
   max_size             = 4
-  desired_capacity     = 1
+  desired_capacity     = 2
   vpc_zone_identifier  = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
   launch_configuration = aws_launch_configuration.upload_launch_configuration.name
 
