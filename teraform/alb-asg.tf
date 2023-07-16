@@ -1,47 +1,3 @@
-# resource "aws_lb" "application_load_balancer" {
-#   name               = "my-alb"
-#   internal           = false
-#   load_balancer_type = "application"
-#   security_groups    = [aws_security_group.custom_security_group.id]
-#   subnets            = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-
-#   tags = {
-#     Name = "MyALB"
-#   }
-# }
-
-# resource "aws_lb_target_group" "target_group" {
-#   name     = "my-target-group"
-#   port     = 5000
-#   protocol = "HTTP"
-#   vpc_id   = aws_vpc.my_vpc.id
-
-#   health_check {
-#     path = "/"
-#   }
-# }
-
-# resource "aws_lb_listener" "listener" {
-#   load_balancer_arn = aws_lb.application_load_balancer.arn
-#   port              = 80
-#   protocol          = "HTTP"
-
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group.arn
-#     type             = "forward"
-#   }
-# }
-
-# resource "aws_autoscaling_group" "autoscaling_group" {
-#   name                 = "my-autoscaling-group"
-#   min_size             = 2
-#   max_size             = 4
-#   desired_capacity     = 2
-#   vpc_zone_identifier  = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
-#   launch_configuration = aws_launch_configuration.launch_configuration.name
-
-#   target_group_arns = [aws_lb_target_group.target_group.arn]
-# }
 resource "aws_lb" "application_load_balancer" {
   name               = "my-alb"
   internal           = false
@@ -67,7 +23,7 @@ resource "aws_lb_target_group" "upload_target_group" {
 
 resource "aws_lb_target_group" "result_target_group" {
   name     = "result-target-group"
-  port     = 80
+  port     = 5000
   protocol = "HTTP"
   vpc_id   = aws_vpc.my_vpc.id
 
@@ -82,7 +38,7 @@ resource "aws_lb_listener" "upload_listener" {
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = aws_lb_target_group.result_target_group.arn
+    target_group_arn = aws_lb_target_group.upload_target_group.arn
     type             = "forward"
   }
 }
@@ -114,11 +70,27 @@ resource "aws_lb_listener" "result_listener" {
   }
 }
 
+resource "aws_lb_listener_rule" "result_listener_rule" {
+  listener_arn = aws_lb_listener.result_listener.arn
+  priority     = 2
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.result_target_group.arn
+  }
+
+  condition {
+    path_pattern{
+      values = ["/result*"]
+    }
+  }
+}
+
 resource "aws_autoscaling_group" "result_autoscaling_group" {
   name                 = "result-autoscaling-group"
-  min_size             = 2
+  min_size             = 1
   max_size             = 4
-  desired_capacity     = 2
+  desired_capacity     = 1
   vpc_zone_identifier  = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
   launch_configuration = aws_launch_configuration.result_launch_configuration.name
 
@@ -127,9 +99,9 @@ resource "aws_autoscaling_group" "result_autoscaling_group" {
 
 resource "aws_autoscaling_group" "upload_autoscaling_group" {
   name                 = "upload-autoscaling-group"
-  min_size             = 2
+  min_size             = 1
   max_size             = 4
-  desired_capacity     = 2
+  desired_capacity     = 1
   vpc_zone_identifier  = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
   launch_configuration = aws_launch_configuration.upload_launch_configuration.name
 

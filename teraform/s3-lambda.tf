@@ -35,10 +35,6 @@ resource "aws_lambda_function" "character_counter_lambda" {
   role             = aws_iam_role.lambda_execution_role.arn
   filename         = data.archive_file.lambda_function.output_path
   source_code_hash = data.archive_file.lambda_function.output_base64sha256
-  # vpc_config {
-  #   subnet_ids         = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
-  #   security_group_ids = [aws_security_group.lambda_security_group.id]
-  # }
 }
 
 resource "aws_iam_role" "lambda_execution_role" {
