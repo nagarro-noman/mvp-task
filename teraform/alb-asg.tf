@@ -97,15 +97,16 @@ resource "aws_lb_listener_rule" "upload_listener_rule" {
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["/upload*"]
+    path_pattern{
+      values = ["/upload*"]
+    }
   }
 }
 
 resource "aws_lb_listener" "result_listener" {
   load_balancer_arn = aws_lb.application_load_balancer.arn
-  port              = 443
-  protocol          = "HTTPS"
+  port              = 80
+  protocol          = "HTTP"
 
   default_action {
     target_group_arn = aws_lb_target_group.result_target_group.arn
@@ -136,7 +137,7 @@ resource "aws_autoscaling_group" "upload_autoscaling_group" {
 }
 
 resource "aws_launch_configuration" "result_launch_configuration" {
-  name                        = "my-launch-configuration"
+  name                        = "my-launch-configuration-result"
   image_id                    = "ami-08e5424edfe926b43"
   instance_type               = "t2.micro"
   associate_public_ip_address = true
@@ -159,7 +160,7 @@ resource "aws_launch_configuration" "result_launch_configuration" {
 
 
 resource "aws_launch_configuration" "upload_launch_configuration" {
-  name                        = "my-launch-configuration"
+  name                        = "my-launch-configuration-upload"
   image_id                    = "ami-08e5424edfe926b43"
   instance_type               = "t2.micro"
   associate_public_ip_address = true
